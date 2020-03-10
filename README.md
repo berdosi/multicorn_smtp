@@ -4,10 +4,11 @@ This is a foreign data wrapper using multicorn and python's urllib module in ord
 
 ## How to Use
 
-1. Install multicorn
-2. Create the server in PostgreSQL
-3. Create the foreign table
-4. Run simple SELECT queries filtering for a single URL.
+1. Make sure you have an SMTP server running on localhost.
+2. Install multicorn
+3. Create the server in PostgreSQL
+4. Create the foreign table
+5. INSERT into the table with `from`, `to`, `subject`, `body_html` and `body` columns.
 
 ```
 $ sudo apt install postgresql-12-python3-multicorn
@@ -15,7 +16,7 @@ $ sudo -u postgres psql target_database
 ```
 
 ```SQL
-CREATE SERVER multicorn_urllib FOREIGN DATA WRAPPER multicorn OPTIONS ( wrapper 'urllibfdw.UrllibForeignDataWrapper' );
-CREATE FOREIGN TABLE some_schema.the_internet ( url CHARACTER VARYING, response CHARACTER VARYING ) SERVER multicorn_urllib;
-SELECT * FROM some_schema.the_internet WHERE url='https://www1.ncdc.noaa.gov/pub/data/cdo/samples/PRECIP_HLY_sample_csv.csv';
+CREATE SERVER multicorn_smtp FOREIGN DATA WRAPPER multicorn OPTIONS ( wrapper 'urllibfdw.MailerForeignDataWrapper' );
+CREATE FOREIGN TABLE some_schema.mailing ( "from" text, "to" text, "subject" text, "body" text, "body_html" text) SERVER multicorn_smtp;
+INSERT INTO some_schema.mailing ("from", "to", "subject", "body", "body_html") VALUES ('sender@example.com', 'recipient@example.com', 'hello world !', '<strong>hello</strong> world !')
 ```
